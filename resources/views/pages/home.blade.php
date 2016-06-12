@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    <div class="row mt20" ng-if="!equal({}, searchRows)">
+    <div class="row mt20" ng-if="searchRows != null">
         <div class="col-lg-12">
             <section class="panel">
                 <table class="table table-striped table-advance table-hover">

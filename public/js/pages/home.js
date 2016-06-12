@@ -37,7 +37,7 @@ var HomeController = function (_ListController) {
                 $scope.headers = [];
                 $scope.contents = [];
                 $scope.isTwoNumber = 0;
-                $scope.searchRows = {};
+                $scope.searchRows = null;
                 $scope.maxTimes = 1;
                 $scope.selectedNumber = -1;
 
@@ -58,7 +58,7 @@ var HomeController = function (_ListController) {
                 // when user change the channel
                 $scope.changeChannel = function () {
                     console.log("changeChannel");
-                    $scope.searchRows = {};
+                    $scope.searchRows = null;
                     $http({
                         method: "POST",
                         url: "home/getResults",

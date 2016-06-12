@@ -22,7 +22,7 @@ class Result extends Model
                   INNER JOIN Results r ON raf.id = r.raffle_id
                   WHERE c.id = :channelId AND raf.id IN ($raffleIds)
                   GROUP BY r.last_two_number
-                  ORDER BY count";
+                  ORDER BY count, r.last_two_number";
 //        print_r($query);
 
         return DB::select($query, ["channelId" => $channelId]);

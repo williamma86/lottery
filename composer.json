@@ -27,6 +27,9 @@
     "autoload-dev": {
         "classmap": [
             "tests/TestCase.php"
+        ],
+        "files": [
+            "app/Helpers/Utils.php"
         ]
     },
     "scripts": {

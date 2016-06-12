@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Channel;
+use App\Helper\Utils;
 use App\Raffle;
 use App\Result;
 use Illuminate\Http\Request;
@@ -41,6 +42,7 @@ class HomeController extends Controller
      */
     public function doAction(Request $request) {
         $data = [];
+        $possibleNumberArray = []; // array hold all number that show on the table
 
         // get raffle of the channel within the selected times
         $raffles = Raffle::where('channel_id', $request->channelId)->orderBy('publish_at', 'DESC')->paginate($request->withinTimes);
@@ -58,14 +60,20 @@ class HomeController extends Controller
 
         // parse result data
         $rows = Result::getLeastAppear($request->channelId, $raffleIds);
+        $data[0] = [];
         $data[$rows[0]->count] = [$rows[0]->last_two_number];
+        $possibleNumberArray[] = $rows[0]->last_two_number;
         for ($i = 1; $i < count($rows); $i++) {
+            $possibleNumberArray[] = $rows[$i]->last_two_number;
             if ($rows[$i]->count == $rows[$i - 1]->count) {
                 $data[$rows[$i]->count][] = $rows[$i]->last_two_number;
             } else {
                 $data[$rows[$i]->count] = [$rows[$i]->last_two_number];
             }
         }
+
+        // apply the count = 0 numbers
+        $data[0] = Utils::getRemainNumbers($possibleNumberArray);
 
         return response()->json($data);
     }
@@ -91,19 +99,24 @@ class HomeController extends Controller
         // generate content
         $prizes = Result::getPrizeCollection();
         foreach($prizes as $prize) {
+            // get number of prize
             $prizeValue = $prize->prize;
-            $contents = [];
-            $contents[] = html_entity_decode($prizeValue);
+            $prizeCount = $channel->raffles()->first()->results()->where('prize', $prizeValue)->count();
 
-            foreach($raffles as $raf) {
-                $prizeResultRow = $raf->results()->where("prize", $prizeValue)->first();
-                $contents[] = [
-                    "number" => $prizeResultRow->number,
-                    "last_two_number" => $prizeResultRow->last_two_number
-                ];
+            for ($i = 0; $i < $prizeCount; $i++) {
+                $contents = [];
+                $contents[] = html_entity_decode($prizeValue);
+
+                foreach($raffles as $raf) {
+                    $prizeResultRow = $raf->results()->where("prize", $prizeValue)->limit(1)->offset($i)->first();
+                    $contents[] = [
+                        "number" => $prizeResultRow->number,
+                        "last_two_number" => $prizeResultRow->last_two_number
+                    ];
+                }
+
+                $data["contents"][] = $contents;
             }
-
-            $data["contents"][] = $contents;
         }
 
         return response()->json($data);
