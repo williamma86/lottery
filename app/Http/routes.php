@@ -12,3 +12,6 @@
 */
 
 Route::get('/', ['as' => 'home', 'uses' => 'HomeController@index']);
+Route::get('/home/getChannels', ['as' => 'getChannels', 'uses' => 'HomeController@getChannels']);
+Route::post('/home/getResults', ['as' => 'getResults', 'uses' => 'HomeController@getResults']);
+Route::post('/home/doAction', ['as' => 'doActionHome', 'uses' => 'HomeController@doAction']);
